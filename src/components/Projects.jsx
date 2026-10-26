@@ -97,11 +97,11 @@ function Projects() {
             <div className="project-card" key={project.title}>
 
               <a
-                href={project.github}
+                href={project.image}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="project-image-link"
-                aria-label={`View ${project.title} on GitHub`}
+                aria-label={`View the full ${project.title} image`}
               >
                 <img
                   src={project.image}
