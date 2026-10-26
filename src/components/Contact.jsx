@@ -5,6 +5,17 @@ const FORM_ENDPOINT = "https://formspree.io/f/mgojybzv";
 
 const Contact = () => {
   const [status, setStatus] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText("jpatience549@gmail.com");
+      setCopyStatus("Copied!");
+      window.setTimeout(() => setCopyStatus(""), 2000);
+    } catch {
+      setCopyStatus("Unable to copy");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -48,6 +59,10 @@ const Contact = () => {
               <p>
                 <a href="mailto:jpatience549@gmail.com">jpatience549@gmail.com</a>
               </p>
+              <button type="button" className="copy-email-button" onClick={handleCopyEmail}>
+                Copy email
+              </button>
+              {copyStatus && <span className="copy-status" role="status">{copyStatus}</span>}
             </div>
 
             <div className="info-card">
@@ -63,11 +78,11 @@ const Contact = () => {
             <div className="info-card">
               <h3>Profiles</h3>
               <p>
-                <a href="https://github.com/patience9090" target="_blank" rel="noopener noreferrer">
+                <a className="profile-link" href="https://github.com/patience9090" target="_blank" rel="noopener noreferrer">
                   GitHub
                 </a>
                 {" · "}
-                <a href="https://linkedin.com/in/patience-joseph-a24900324" target="_blank" rel="noopener noreferrer">
+                <a className="profile-link" href="https://linkedin.com/in/patience-joseph-a24900324" target="_blank" rel="noopener noreferrer">
                   LinkedIn
                 </a>
               </p>

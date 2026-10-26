@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "./projects.css";
 
 import weatherImg from "../assets/weather-app.png";
@@ -15,6 +16,8 @@ const projects = [
     description:
       "A responsive weather application with real-time weather updates and forecasts.",
     tech: "React • API • CSS",
+    category: "Frontend",
+    status: "Completed",
     github: "https://github.com/patience9090/weather_app.git",
   },
 
@@ -24,6 +27,8 @@ const projects = [
     description:
       "A full-stack student management system with authentication, profiles and records management.",
     tech: "React • FastAPI • MongoDB",
+    category: "Full-stack",
+    status: "Completed",
     github: "https://github.com/IT-Climax/it_farms.git",
   },
 
@@ -33,6 +38,8 @@ const projects = [
     description:
      "A LinkedIn-focused networking and visibility platform with authentication, profiles and creator community features.",
     tech: "Next.js • React • Tailwind CSS • Clerk • FastAPI • MongoDB",
+    category: "Full-stack",
+    status: "In Progress",
     github: "https://github.com/patience9090/lynktik",
   },
 
@@ -42,6 +49,9 @@ const projects = [
     description:
       "A modern portfolio website showcasing my skills, projects and services.",
     tech: "React • Vite • CSS",
+    category: "Frontend",
+    status: "Live",
+    demo: "https://patience9090.github.io/portfolio/",
     github: "https://github.com/patience9090/portfolio",
   },
 
@@ -51,6 +61,8 @@ const projects = [
     description:
       "A Windows and Android application for sharing Wi-Fi between a laptop and phone without relying on a traditional hotspot.",
     tech: "C# • .NET 8 • WPF • Android • Gradle",
+    category: "Desktop & Mobile",
+    status: "In Progress",
     github: "https://github.com/patience9090/WiRelay",
   },
 
@@ -60,6 +72,8 @@ const projects = [
     description:
       "A platform where customers can book phone repairs, maintenance services and connect with trusted technicians.",
     tech: "React • Node.js • MongoDB",
+    category: "Full-stack",
+    status: "Completed",
     github: "https://github.com/fatieeeaminuuu/MIH-project.git",
   },
 
@@ -69,11 +83,38 @@ const projects = [
     description:
       "A responsive website developed for a client with a focus on business growth and user experience.",
     tech: "React • CSS • JavaScript",
+    category: "Frontend",
+    status: "Live",
     github: "https://github.com/patience9090/ClientWebsite.git",
   },
 ];
 
 function Projects() {
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedProject, setSelectedProject] = useState(null);
+  const categories = ["All", ...new Set(projects.map((project) => project.category))];
+  const filteredProjects = activeFilter === "All"
+    ? projects
+    : projects.filter((project) => project.category === activeFilter);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSelectedProject(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = selectedProject ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedProject]);
+
   return (
     <section className="projects" id="projects">
       <div className="container">
@@ -91,16 +132,29 @@ function Projects() {
           backend and full-stack development skills.
         </p>
 
+        <div className="project-filters" aria-label="Filter projects by category">
+          {categories.map((category) => (
+            <button
+              type="button"
+              className={`filter-button ${activeFilter === category ? "active" : ""}`}
+              onClick={() => setActiveFilter(category)}
+              aria-pressed={activeFilter === category}
+              key={category}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
         <div className="projects-grid">
 
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <div className="project-card" key={project.title}>
 
-              <a
-                href={project.image}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="project-image-link"
+                onClick={() => setSelectedProject(project)}
                 aria-label={`View the full ${project.title} image`}
               >
                 <img
@@ -108,11 +162,17 @@ function Projects() {
                   alt={project.title}
                   className="project-image"
                 />
-              </a>
+                <span className="image-overlay">View image</span>
+              </button>
 
               <div className="project-content">
 
-                <h3>{project.title}</h3>
+                <div className="project-heading">
+                  <h3>{project.title}</h3>
+                  <span className={`project-status status-${project.status.toLowerCase().replace(" ", "-")}`}>
+                    {project.status}
+                  </span>
+                </div>
 
                 <p>{project.description}</p>
 
@@ -121,13 +181,17 @@ function Projects() {
                 </span>
 
                 <div className="project-buttons">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="github-btn"
-                  >
-                    Check it out on GitHub →
+                  {project.demo ? (
+                    <a href={project.demo} target="_blank" rel="noopener noreferrer" className="demo-btn">
+                      Live Demo ↗
+                    </a>
+                  ) : (
+                    <span className="demo-btn disabled" aria-label={`${project.title} demo is not available`}>
+                      Live Demo unavailable
+                    </span>
+                  )}
+                  <a href={project.github} target="_blank" rel="noopener noreferrer" className="github-btn">
+                    GitHub ↗
                   </a>
                 </div>
 
@@ -139,6 +203,33 @@ function Projects() {
         </div>
 
       </div>
+
+      {selectedProject && (
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selectedProject.title} full-size image`}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedProject(null);
+            }
+          }}
+        >
+          <div className="lightbox-content">
+            <button
+              type="button"
+              className="lightbox-close"
+              onClick={() => setSelectedProject(null)}
+              aria-label="Close image viewer"
+            >
+              ×
+            </button>
+            <img src={selectedProject.image} alt={`${selectedProject.title} full-size preview`} />
+            <p>{selectedProject.title}</p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
